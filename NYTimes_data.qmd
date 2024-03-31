@@ -1,0 +1,35 @@
+---
+title: "New York Times Covid Data"
+output: pdf
+---
+
+```{r libraries_datasets}
+
+#libraries and data
+library(tidyverse)
+library(readr)
+NYTimes_counties <- read_csv("~/Duke/Junior Year 23-24/Spring Semester/Compsci 216/Project/Raw Data/NYTimes_counties.csv")
+
+```
+
+```{r reformatting}
+
+#filtering for start of the year only
+NYTimes_counties <- NYTimes_counties |>
+  filter(date == '2021-01-01'| date == '2022-01-01' | date == '2022-05-13')
+
+#calculating deaths by year for each county
+NYT_counties <- NYTimes_counties |>
+  group_by(county, fips, year = case_when(
+    date == '2021-01-01' ~ 2020,
+    date == '2022-01-01' ~ 2021,
+    date == '2022-05-13' ~ 2022
+  )) |>
+  summarise(total_cases = sum(cases, na.rm = TRUE),
+            total_deaths = sum(deaths, na.rm = TRUE))
+
+#outputting to csv
+file_path <- "~/Duke/Junior Year 23-24/Spring Semester/Compsci 216/Project/Cleaned Data/NYT_counties.csv"
+write.csv(NYT_counties, file = file_path, row.names = FALSE)
+
+```
