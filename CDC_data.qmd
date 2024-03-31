@@ -1,0 +1,36 @@
+---
+title: "CDC Data"
+output: pdf
+---
+
+```{r libraries_data}
+
+library(tidyverse)
+library(readr)
+CDC_vacc <- read_csv("~/Duke/Junior Year 23-24/Spring Semester/Compsci 216/Project/Cleaned Data/CLEANED_Vaccinations_in_US_by_County.csv")
+
+```
+
+```{r reformatting}
+
+#filtering for start of the year only
+CDC_vacc <- CDC_vacc |>
+  filter(Date == '2021-01-04'| Date == '2022-01-07' | Date == '2023-01-04')
+
+#calculating deaths by year for each county
+CDC_vacc <- CDC_vacc |>
+  group_by(Recip_County, FIPS, year = case_when(
+    Date == '2021-01-04' ~ 2020,
+    Date == '2022-01-07' ~ 2021,
+    Date == '2023-01-04' ~ 2022
+  )) |>
+  summarise(total_vacc = sum(Series_Complete_Yes, na.rm = TRUE))
+
+#outputting to csv
+file_path <- "~/Duke/Junior Year 23-24/Spring Semester/Compsci 216/Project/Cleaned Data/CDC_data.csv"
+write.csv(CDC_vacc, file = file_path, row.names = FALSE)
+
+```
+
+
+
